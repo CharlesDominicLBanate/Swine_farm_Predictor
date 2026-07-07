@@ -7,7 +7,7 @@ import streamlit as st
 
 from predictor_engine import SwineFarmPredictor
 from forecast_engine import IncomeForecastEngine
-from report_generator import generate_pdf_report
+from report_generator import generate_pdf_report, generate_forecast_pdf_report
 import history_manager
 
 THEMES = {
@@ -70,7 +70,7 @@ st.markdown(
     section[data-testid="stSidebar"] {{ background-color: {PANEL}; }}
     div[data-testid="stMetric"] {{ background-color: {PANEL}; padding: 10px 14px; border-radius: 10px; }}
 
- 
+   
     label, .stMarkdown, .stCaption, .stMarkdown p,
     h1, h2, h3, h4, h5, h6,
     [data-testid="stWidgetLabel"] p,
@@ -97,7 +97,7 @@ st.markdown(
     }}
     [data-testid="stMetricLabel"] {{ color: {TEXT_MUTED} !important; }}
 
-  
+    
     button[data-baseweb="tab"] {{
         color: {TEXT_MUTED} !important;
     }}
@@ -108,7 +108,7 @@ st.markdown(
         color: {ACCENT} !important;
     }}
 
-    
+  
     div[data-testid="stAlert"] {{
         background-color: {PANEL} !important;
         border: 1px solid {GRID} !important;
@@ -117,7 +117,7 @@ st.markdown(
         color: {TEXT} !important;
     }}
 
-   
+    
     .stButton button,
     .stFormSubmitButton button,
     .stDownloadButton button,
@@ -305,6 +305,7 @@ with tab_pred:
         st.subheader("Explanation")
         st.info(result["explanation_fil"])
 
+
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             pdf_path = generate_pdf_report(result, data, tmp.name, farm_name=st.session_state.farm_name)
         with open(pdf_path, "rb") as f:
@@ -366,6 +367,30 @@ with tab_forecast:
             ]].copy()
             display_df.columns = ["Month", "Revenue (₱)", "Expenses (₱)", "Net Income (₱)", "Margin (%)"]
             st.dataframe(display_df, use_container_width=True, hide_index=True)
+
+        
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_chart:
+                fig.savefig(tmp_chart.name, facecolor=PANEL, dpi=150, bbox_inches="tight")
+                chart_path = tmp_chart.name
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_pdf:
+                forecast_pdf_path = generate_forecast_pdf_report(
+                    forecast_rows,
+                    farm_name=st.session_state.farm_name,
+                    horizon_months=horizon,
+                    chart_image_path=chart_path,
+                    output_path=tmp_pdf.name,
+                )
+            with open(forecast_pdf_path, "rb") as f:
+                forecast_pdf_bytes = f.read()
+
+            st.download_button(
+                "📄 DOWNLOAD FORECAST AS PDF",
+                data=forecast_pdf_bytes,
+                file_name=f"income_forecast_{horizon}mo_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+            )
 
 with tab_history:
     df_hist = history_manager.load_history()
