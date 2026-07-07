@@ -55,11 +55,12 @@ def _styles():
     ss = getSampleStyleSheet()
     ss.add(ParagraphStyle(
         name="ReportTitle", fontName="Helvetica-Bold", fontSize=18,
-        textColor=SOIL_DARK, spaceAfter=2, alignment=TA_LEFT,
+        leading=22, textColor=SOIL_DARK, spaceAfter=8, alignment=TA_LEFT,
     ))
     ss.add(ParagraphStyle(
         name="ReportSubtitle", fontName="Helvetica", fontSize=10,
-        textColor=TEXT_MUTED, spaceAfter=10, alignment=TA_LEFT,
+        leading=13, textColor=TEXT_MUTED, spaceBefore=2, spaceAfter=10,
+        alignment=TA_LEFT,
     ))
     ss.add(ParagraphStyle(
         name="SectionHead", fontName="Helvetica-Bold", fontSize=12,
