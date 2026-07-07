@@ -87,15 +87,60 @@ st.markdown(
        theme settings (config.toml can be overridden by Community Cloud's
        dashboard theme picker, which otherwise leaves labels/headers dark
        on our dark background). Inline styles elsewhere (badges, metrics
-       cards) have higher CSS specificity, so they are not affected by this. */
+       cards) have higher CSS specificity, so they are not affected by this.
+       This list is intentionally broad — it also covers widgets that were
+       previously left unstyled (radio, checkbox, tabs, slider ticks,
+       alert boxes, expander, file uploader, form labels). */
     label, .stMarkdown, .stCaption, .stMarkdown p,
     h1, h2, h3, h4, h5, h6,
     [data-testid="stWidgetLabel"] p,
+    [data-testid="stWidgetLabel"] label,
     [data-testid="stMetricValue"],
-    [data-testid="stMarkdownContainer"] p {{
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMarkdownContainer"] span,
+    [data-testid="stRadio"] label p,
+    [data-testid="stRadio"] div[role="radiogroup"] label,
+    [data-testid="stCheckbox"] label p,
+    [data-testid="stCheckbox"] span,
+    [data-testid="stNumberInput"] label p,
+    [data-testid="stTextInput"] label p,
+    [data-testid="stSlider"] label p,
+    [data-testid="stSlider"] div[data-testid="stTickBarMin"],
+    [data-testid="stSlider"] div[data-testid="stTickBarMax"],
+    [data-testid="stExpander"] summary p,
+    [data-testid="stFileUploaderDropzone"] div,
+    div[data-testid="stForm"] label,
+    div[data-testid="stForm"] p,
+    div[data-testid="stDataFrame"] div {{
         color: {TEXT} !important;
     }}
     [data-testid="stMetricLabel"] {{ color: {TEXT_MUTED} !important; }}
+
+    /* Tabs (Prediction / Income Forecast / History): inactive tabs were
+       previously left to the platform default, which could render as
+       low-contrast text on our custom background. */
+    button[data-baseweb="tab"] {{
+        color: {TEXT_MUTED} !important;
+    }}
+    button[data-baseweb="tab"] p {{
+        color: inherit !important;
+    }}
+    button[data-baseweb="tab"][aria-selected="true"] {{
+        color: {ACCENT} !important;
+    }}
+
+    /* st.info / st.success / st.error / st.warning boxes: give them our
+       own panel background + text color so they stay legible no matter
+       what the hosting platform's theme does to Streamlit's own alert
+       colors. */
+    div[data-testid="stAlert"] {{
+        background-color: {PANEL} !important;
+        border: 1px solid {GRID} !important;
+    }}
+    div[data-testid="stAlert"] p {{
+        color: {TEXT} !important;
+    }}
     </style>
     """,
     unsafe_allow_html=True,
