@@ -43,6 +43,20 @@ st.markdown(
     .stApp {{ background-color: {BG}; }}
     section[data-testid="stSidebar"] {{ background-color: {PANEL}; }}
     div[data-testid="stMetric"] {{ background-color: {PANEL}; padding: 10px 14px; border-radius: 10px; }}
+
+    /* Force readable text color regardless of the deployment's Streamlit
+       theme settings (config.toml can be overridden by Community Cloud's
+       dashboard theme picker, which otherwise leaves labels/headers dark
+       on our dark background). Inline styles elsewhere (badges, metrics
+       cards) have higher CSS specificity, so they are not affected by this. */
+    label, .stMarkdown, .stCaption, .stMarkdown p,
+    h1, h2, h3, h4, h5, h6,
+    [data-testid="stWidgetLabel"] p,
+    [data-testid="stMetricValue"],
+    [data-testid="stMarkdownContainer"] p {{
+        color: {TEXT} !important;
+    }}
+    [data-testid="stMetricLabel"] {{ color: {TEXT_MUTED} !important; }}
     </style>
     """,
     unsafe_allow_html=True,
