@@ -1,24 +1,6 @@
 import numpy as np
 import pandas as pd
 
-# Fixed bounds for the loss-averse "expected utility" normalization.
-#
-# These were derived empirically from a large representative sample of the
-# synthetic training population (20,000 farms) covering the realistic range
-# of relative_gain = (monthly_revenue - monthly_expenses) / capital, run
-# through the same sqrt / loss-aversion transform used below. A small
-# safety margin is added on each side so real-world inputs that fall
-# slightly outside the training sample's exact min/max still land inside
-# 0-100 instead of clipping at the edge.
-#
-# IMPORTANT: these must stay FIXED constants rather than being recomputed
-# from whatever DataFrame is passed in. The previous implementation did
-# `utility_raw.min()` / `utility_raw.max()` on the incoming batch itself,
-# which works when training on the full dataset (many rows -> a real
-# range) but silently breaks for single-row inference: with exactly one
-# row, min == max, so every prediction normalized to (x - x) / (~0) = 0,
-# regardless of the actual value. Using fixed, precomputed bounds makes
-# the score consistent whether you engineer features for 1 row or 10,000.
 UTILITY_RAW_MIN = -1.4
 UTILITY_RAW_MAX = 1.1
 
@@ -48,10 +30,7 @@ def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
         np.sqrt(np.abs(relative_gain)),
         -loss_aversion_lambda * np.sqrt(np.abs(relative_gain)),
     )
-    # Normalize against FIXED bounds (see comment above) instead of the
-    # min/max of whatever batch happens to be passed in, so a single-row
-    # prediction and a full-dataset training pass produce comparable,
-    # meaningful scores.
+   
     utility_raw_clipped = np.clip(utility_raw, UTILITY_RAW_MIN, UTILITY_RAW_MAX)
     df["expected_utility_score"] = (
         (utility_raw_clipped - UTILITY_RAW_MIN) / (UTILITY_RAW_MAX - UTILITY_RAW_MIN) * 100
