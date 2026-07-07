@@ -1,9 +1,3 @@
-"""
-Part 2: Feature Engineering + Decision Theory Module
-Translates Decision Theory (expected utility, risk-adjusted decision-making)
-into concrete, computable features.
-"""
-
 import numpy as np
 import pandas as pd
 
@@ -11,7 +5,6 @@ import pandas as pd
 def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
-    # --- Core financial ratios ---
     df["cash_flow_ratio"] = df["monthly_revenue"] / df["monthly_expenses"].replace(0, np.nan)
     df["cash_flow_ratio"] = df["cash_flow_ratio"].fillna(0)
 
@@ -23,7 +16,6 @@ def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
     df["loan_dependency_pct"] = (df["loan_amount"] / df["capital"].replace(0, np.nan)) * 100
     df["loan_dependency_pct"] = df["loan_dependency_pct"].fillna(0).clip(0, 100)
 
-    # --- risk_score (0-100): higher = riskier ---
     leverage_component = df["loan_dependency_pct"].clip(0, 100)
     liquidity_pressure = (1 - (df["cash_flow_ratio"].clip(0, 3) / 3)) * 100
     expense_pressure = (df["monthly_expenses"] / df["monthly_revenue"].replace(0, np.nan)).fillna(1).clip(0, 2) * 50
@@ -32,8 +24,6 @@ def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
         0.4 * leverage_component + 0.35 * liquidity_pressure + 0.25 * expense_pressure
     ).clip(0, 100).round(1)
 
-    # --- expected_utility_score (0-100): loss-averse utility function ---
-    # based on cash flow relative to capital; loss-aversion => large penalty for negative net cash flow
     net_cash_flow = df["monthly_revenue"] - df["monthly_expenses"]
     relative_gain = net_cash_flow / df["capital"].replace(0, np.nan).clip(lower=1)
     relative_gain = relative_gain.fillna(0)
@@ -44,20 +34,17 @@ def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
         np.sqrt(np.abs(relative_gain)),
         -loss_aversion_lambda * np.sqrt(np.abs(relative_gain)),
     )
-    # normalize to 0-100
     u_min, u_max = utility_raw.min(), utility_raw.max()
     df["expected_utility_score"] = (
         (utility_raw - u_min) / (u_max - u_min + 1e-9) * 100
     ).round(1)
 
-    # --- liquidity_health_index (0-100): "financial health meter" ---
     df["liquidity_health_index"] = (
         0.5 * (df["cash_flow_ratio"].clip(0, 3) / 3 * 100)
         + 0.3 * (100 - df["loan_dependency_pct"])
         + 0.2 * df["market_access_score"]
     ).clip(0, 100).round(1)
 
-    # --- rule-based decision_recommendation (explainable baseline) ---
     def recommend(row):
         if row["risk_score"] >= 65:
             return "High Risk"
@@ -68,8 +55,6 @@ def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
         return "Maintain"
 
     df["decision_recommendation"] = df.apply(recommend, axis=1)
-
-    # --- profitability_class (target label) ---
     def classify_profit(pm):
         if pm < 8:
             return "Low"
