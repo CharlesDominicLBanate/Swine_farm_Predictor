@@ -1,17 +1,3 @@
-"""
-Part 8c: Income Forecast Engine
-The sole entry point called by the UI for the "Income Forecast" feature. It takes
-the current farm profile (the same input as SwineFarmPredictor),
-and produces a month-by-month projection of revenue, expenses, net income,
-and profit margin for the next N months.
-
-Approach: the model predicts a "growth index" (relative to the
-user's current monthly revenue/expenses) instead of a direct
-value — so the forecast is personalized to the user's actual
-numbers, while the learned trend/seasonality/risk pattern comes
-from a broad synthetic simulation.
-"""
-
 import datetime
 import numpy as np
 import pandas as pd
@@ -44,8 +30,6 @@ class IncomeForecastEngine:
         base_revenue = float(farm_data["monthly_revenue"])
         base_expenses = float(farm_data["monthly_expenses"])
 
-        # --- build all months as a single batch (faster than
-        # repeated single-row predictions) ---
         feat_rows = []
         target_dates = []
         for t in range(1, horizon_months + 1):
