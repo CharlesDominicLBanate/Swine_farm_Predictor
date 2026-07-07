@@ -1,14 +1,3 @@
-"""
-Streamlit web version of the Swine Farm Profitability Predictor.
-This uses the same backend logic (predictor_engine, forecast_engine,
-report_generator, history_manager) — just a new UI layer using
-Streamlit instead of a CustomTkinter desktop app.
-
-How to run locally:
-    pip install -r requirements.txt
-    streamlit run streamlit_app.py
-"""
-
 import datetime
 import tempfile
 
@@ -21,7 +10,6 @@ from forecast_engine import IncomeForecastEngine
 from report_generator import generate_pdf_report
 import history_manager
 
-# ---------------------------------------------------------------- palettes --
 THEMES = {
     "dark": {
         "BG": "#1B2420",
@@ -51,7 +39,6 @@ st.set_page_config(
     layout="wide",
 )
 
-# ------------------------------------------------------------ theme toggle --
 if "theme" not in st.session_state:
     st.session_state.theme = "dark"
 
@@ -83,14 +70,7 @@ st.markdown(
     section[data-testid="stSidebar"] {{ background-color: {PANEL}; }}
     div[data-testid="stMetric"] {{ background-color: {PANEL}; padding: 10px 14px; border-radius: 10px; }}
 
-    /* Force readable text color regardless of the deployment's Streamlit
-       theme settings (config.toml can be overridden by Community Cloud's
-       dashboard theme picker, which otherwise leaves labels/headers dark
-       on our dark background). Inline styles elsewhere (badges, metrics
-       cards) have higher CSS specificity, so they are not affected by this.
-       This list is intentionally broad — it also covers widgets that were
-       previously left unstyled (radio, checkbox, tabs, slider ticks,
-       alert boxes, expander, file uploader, form labels). */
+ 
     label, .stMarkdown, .stCaption, .stMarkdown p,
     h1, h2, h3, h4, h5, h6,
     [data-testid="stWidgetLabel"] p,
@@ -117,9 +97,7 @@ st.markdown(
     }}
     [data-testid="stMetricLabel"] {{ color: {TEXT_MUTED} !important; }}
 
-    /* Tabs (Prediction / Income Forecast / History): inactive tabs were
-       previously left to the platform default, which could render as
-       low-contrast text on our custom background. */
+  
     button[data-baseweb="tab"] {{
         color: {TEXT_MUTED} !important;
     }}
@@ -130,10 +108,7 @@ st.markdown(
         color: {ACCENT} !important;
     }}
 
-    /* st.info / st.success / st.error / st.warning boxes: give them our
-       own panel background + text color so they stay legible no matter
-       what the hosting platform's theme does to Streamlit's own alert
-       colors. */
+    
     div[data-testid="stAlert"] {{
         background-color: {PANEL} !important;
         border: 1px solid {GRID} !important;
@@ -142,12 +117,7 @@ st.markdown(
         color: {TEXT} !important;
     }}
 
-    /* Buttons (Predict, Download PDF, Clear History, form submit, etc.):
-       these render with a plain white background by default on Streamlit
-       Community Cloud, which — combined with our forced light text color
-       above — made the label nearly invisible (light text on white).
-       Give every button an explicit background + high-contrast text so
-       it never depends on the platform's own button styling. */
+   
     .stButton button,
     .stFormSubmitButton button,
     .stDownloadButton button,
@@ -189,7 +159,6 @@ with col_title:
     st.caption("Decision-support tool for hog raisers in Bayugan City — RBV Theory + Decision Theory")
 
 
-# ------------------------------------------------------------ cached models --
 @st.cache_resource(show_spinner="Loading prediction models...")
 def load_predictor():
     return SwineFarmPredictor()
@@ -208,7 +177,6 @@ for key, default in [("last_result", None), ("last_data", None), ("farm_name", "
         st.session_state[key] = default
 
 
-# ------------------------------------------------------------ sidebar form --
 with st.sidebar:
     st.header("Farm Profile Input")
     st.caption("Enter your farm's data for this month.")
@@ -258,10 +226,8 @@ with st.sidebar:
             st.success("Prediction complete! See the results on the right.")
 
 
-# ------------------------------------------------------------------- tabs --
 tab_pred, tab_forecast, tab_history = st.tabs(["🔍 Prediction", "💰 Income Forecast", "🕒 History"])
 
-# ============================================================= PREDICTION ==
 with tab_pred:
     result = st.session_state.last_result
     data = st.session_state.last_data
@@ -339,7 +305,6 @@ with tab_pred:
         st.subheader("Explanation")
         st.info(result["explanation_fil"])
 
-        # --- PDF export ---
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             pdf_path = generate_pdf_report(result, data, tmp.name, farm_name=st.session_state.farm_name)
         with open(pdf_path, "rb") as f:
@@ -352,7 +317,6 @@ with tab_pred:
             use_container_width=True,
         )
 
-# ================================================================ FORECAST ==
 with tab_forecast:
     if st.session_state.last_data is None:
         st.info("First make a prediction in the sidebar using your farm's actual data before viewing the Income Forecast — to make sure it's based on the right numbers.")
@@ -403,7 +367,6 @@ with tab_forecast:
             display_df.columns = ["Month", "Revenue (₱)", "Expenses (₱)", "Net Income (₱)", "Margin (%)"]
             st.dataframe(display_df, use_container_width=True, hide_index=True)
 
-# ================================================================= HISTORY ==
 with tab_history:
     df_hist = history_manager.load_history()
 
