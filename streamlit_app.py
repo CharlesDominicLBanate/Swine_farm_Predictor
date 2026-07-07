@@ -21,21 +21,60 @@ from forecast_engine import IncomeForecastEngine
 from report_generator import generate_pdf_report
 import history_manager
 
-# ---------------------------------------------------------------- palette --
-BG = "#1B2420"
-PANEL = "#232F29"
-ACCENT = "#6FA875"
-ACCENT_2 = "#C9973F"
-TEXT = "#EDEDE3"
-TEXT_MUTED = "#93A399"
-CLASS_COLORS = {"Low": "#C0533E", "Moderate": "#D9A441", "High": "#6FA875"}
-REC_COLORS = {"Expand": ACCENT, "Maintain": "#6FA875", "Cost-Cutting Needed": "#D9A441", "High Risk": "#C0533E"}
+# ---------------------------------------------------------------- palettes --
+THEMES = {
+    "dark": {
+        "BG": "#1B2420",
+        "PANEL": "#232F29",
+        "ACCENT": "#6FA875",
+        "ACCENT_2": "#C9973F",
+        "TEXT": "#EDEDE3",
+        "TEXT_MUTED": "#93A399",
+        "GRID": "#35443C",
+        "CLASS_COLORS": {"Low": "#C0533E", "Moderate": "#D9A441", "High": "#6FA875"},
+    },
+    "light": {
+        "BG": "#F5F3EC",
+        "PANEL": "#FFFFFF",
+        "ACCENT": "#3F7A4C",
+        "ACCENT_2": "#B4791F",
+        "TEXT": "#1B2420",
+        "TEXT_MUTED": "#5B6B60",
+        "GRID": "#D8D4C6",
+        "CLASS_COLORS": {"Low": "#B23A26", "Moderate": "#B4791F", "High": "#3F7A4C"},
+    },
+}
 
 st.set_page_config(
     page_title="Swine Farm Profitability Predictor",
     page_icon="🐖",
     layout="wide",
 )
+
+# ------------------------------------------------------------ theme toggle --
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+
+col_title, col_toggle = st.columns([5, 1])
+with col_toggle:
+    is_dark = st.toggle("🌙 Dark", value=(st.session_state.theme == "dark"))
+    st.session_state.theme = "dark" if is_dark else "light"
+
+p = THEMES[st.session_state.theme]
+BG = p["BG"]
+PANEL = p["PANEL"]
+ACCENT = p["ACCENT"]
+ACCENT_2 = p["ACCENT_2"]
+TEXT = p["TEXT"]
+TEXT_MUTED = p["TEXT_MUTED"]
+GRID = p["GRID"]
+CLASS_COLORS = p["CLASS_COLORS"]
+REC_COLORS = {
+    "Expand": ACCENT,
+    "Maintain": ACCENT,
+    "Cost-Cutting Needed": ACCENT_2,
+    "High Risk": CLASS_COLORS["Low"],
+}
 
 st.markdown(
     f"""
@@ -62,8 +101,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("🐖 Swine Farm Profitability Predictor")
-st.caption("Decision-support tool for hog raisers in Bayugan City — RBV Theory + Decision Theory")
+with col_title:
+    st.title("🐖 Swine Farm Profitability Predictor")
+    st.caption("Decision-support tool for hog raisers in Bayugan City — RBV Theory + Decision Theory")
 
 
 # ------------------------------------------------------------ cached models --
@@ -265,7 +305,7 @@ with tab_forecast:
             ax.tick_params(colors=TEXT, labelsize=9)
             for spine in ax.spines.values():
                 spine.set_visible(False)
-            ax.grid(axis="y", color="#35443C", linewidth=0.6, alpha=0.6)
+            ax.grid(axis="y", color=GRID, linewidth=0.6, alpha=0.6)
             legend = ax.legend(loc="upper left", frameon=False)
             for t in legend.get_texts():
                 t.set_color(TEXT)
@@ -308,7 +348,7 @@ with tab_history:
         ax.tick_params(colors=TEXT, labelsize=9)
         for spine in ax.spines.values():
             spine.set_visible(False)
-        ax.grid(axis="y", color="#35443C", linewidth=0.6, alpha=0.6)
+        ax.grid(axis="y", color=GRID, linewidth=0.6, alpha=0.6)
         ax.set_title("Profit Margin Trend", color=TEXT, fontsize=11, loc="left")
         fig.tight_layout()
         st.pyplot(fig)
