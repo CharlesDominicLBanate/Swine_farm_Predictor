@@ -141,6 +141,44 @@ st.markdown(
     div[data-testid="stAlert"] p {{
         color: {TEXT} !important;
     }}
+
+    /* Buttons (Predict, Download PDF, Clear History, form submit, etc.):
+       these render with a plain white background by default on Streamlit
+       Community Cloud, which — combined with our forced light text color
+       above — made the label nearly invisible (light text on white).
+       Give every button an explicit background + high-contrast text so
+       it never depends on the platform's own button styling. */
+    .stButton button,
+    .stFormSubmitButton button,
+    .stDownloadButton button,
+    div[data-testid="stFormSubmitButton"] button,
+    div[data-testid="stDownloadButton"] button,
+    div[data-testid="stBaseButton-secondary"] button {{
+        background-color: {ACCENT} !important;
+        color: #12180F !important;
+        border: 1px solid {ACCENT} !important;
+    }}
+    .stButton button p,
+    .stFormSubmitButton button p,
+    .stDownloadButton button p,
+    div[data-testid="stFormSubmitButton"] button p,
+    div[data-testid="stDownloadButton"] button p {{
+        color: #12180F !important;
+    }}
+    .stButton button:hover,
+    .stFormSubmitButton button:hover,
+    .stDownloadButton button:hover {{
+        background-color: {ACCENT_2} !important;
+        border: 1px solid {ACCENT_2} !important;
+        color: #12180F !important;
+    }}
+    .stButton button:disabled,
+    .stFormSubmitButton button:disabled,
+    .stDownloadButton button:disabled {{
+        background-color: {GRID} !important;
+        color: {TEXT_MUTED} !important;
+        border: 1px solid {GRID} !important;
+    }}
     </style>
     """,
     unsafe_allow_html=True,
