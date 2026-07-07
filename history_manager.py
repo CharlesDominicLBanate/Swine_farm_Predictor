@@ -1,9 +1,3 @@
-"""
-Part 7: Prediction History Manager
-Logs every prediction to a local CSV file so you can see the
-farm's profitability change over time.
-"""
-
 import os
 import datetime
 import pandas as pd
