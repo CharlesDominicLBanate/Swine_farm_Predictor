@@ -1,11 +1,3 @@
-"""
-Part 8b: Income Forecast Model Training
-Trains two RandomForestRegressor models that predict a
-"revenue_index" and "expense_index" — growth multipliers relative to a
-particular farm's current monthly revenue/expenses, based on the
-farm profile + how many months ahead (month_offset) + seasonality.
-"""
-
 import os
 import joblib
 import numpy as np
