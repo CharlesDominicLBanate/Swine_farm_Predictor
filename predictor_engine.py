@@ -1,10 +1,3 @@
-"""
-Part 4: Predictor Engine
-Main entry point called by the UI. Accepts raw input from the user,
-runs it through feature engineering, uses the trained models, and produces
-a complete, explainable prediction report.
-"""
-
 import numpy as np
 import pandas as pd
 
