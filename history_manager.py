@@ -17,7 +17,6 @@ HISTORY_COLUMNS = [
 
 
 def log_prediction(data: dict, result: dict, farm_name: str = "") -> None:
-    """Append a new row to the history CSV based on the input data and result."""
     row = {
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "farm_name": farm_name or "",
@@ -41,7 +40,6 @@ def log_prediction(data: dict, result: dict, farm_name: str = "") -> None:
 
 
 def load_history() -> pd.DataFrame:
-    """Load the full history as a DataFrame (most recent first)."""
     if not os.path.exists(HISTORY_PATH):
         return pd.DataFrame(columns=HISTORY_COLUMNS)
     df = pd.read_csv(HISTORY_PATH)
@@ -51,13 +49,11 @@ def load_history() -> pd.DataFrame:
 
 
 def clear_history() -> None:
-    """Delete the entire history file."""
     if os.path.exists(HISTORY_PATH):
         os.remove(HISTORY_PATH)
 
 
 if __name__ == "__main__":
-    # short self-test
     sample_data = {
         "herd_size": 60, "years_operating": 5, "labor_count": 2, "capital": 150000,
         "feed_inventory_kg": 1800, "digital_transaction_freq": 10, "market_access_score": 65,
