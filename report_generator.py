@@ -1,9 +1,3 @@
-"""
-Part 6: PDF Report Generator
-Generates a professional, formatted PDF report from a prediction result
-for presentation to a cooperative, lending institution, or LGU.
-"""
-
 import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -14,7 +8,6 @@ from reportlab.platypus import (
 )
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
 
-# ------------------------------------------------------------------ colors --
 SOIL_DARK = colors.HexColor("#1B2420")
 SAGE = colors.HexColor("#6FA875")
 OCHRE = colors.HexColor("#C9973F")
@@ -90,10 +83,7 @@ def _styles():
 
 
 def generate_pdf_report(result: dict, data: dict, output_path: str, farm_name: str = "") -> str:
-    """
-    Creates a PDF report at `output_path` based on the prediction `result` and raw
-    input `data`. Returns the output_path after saving.
-    """
+
     styles = _styles()
     doc = SimpleDocTemplate(
         output_path, pagesize=letter,
@@ -102,7 +92,6 @@ def generate_pdf_report(result: dict, data: dict, output_path: str, farm_name: s
     )
     story = []
 
-    # ---------------------------------------------------------- header ----
     story.append(Paragraph("Swine Farm Profitability Prediction Report", styles["ReportTitle"]))
     subtitle = "Decision-support tool for hog raisers in Bayugan City"
     if farm_name:
@@ -114,7 +103,6 @@ def generate_pdf_report(result: dict, data: dict, output_path: str, farm_name: s
     ))
     story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#35443C"), spaceBefore=10, spaceAfter=14))
 
-    # ------------------------------------------------------- top summary ---
     cls = result["predicted_class"]
     cls_color = CLASS_COLORS.get(cls, SAGE)
 
@@ -139,7 +127,6 @@ def generate_pdf_report(result: dict, data: dict, output_path: str, farm_name: s
     story.append(top_row)
     story.append(Spacer(1, 4))
 
-    # -------------------------------------------------- probability table --
     story.append(Paragraph("Probability Breakdown", styles["SectionHead"]))
     proba = result["probability_breakdown"]
     order = ["Low", "Moderate", "High"]
@@ -160,7 +147,6 @@ def generate_pdf_report(result: dict, data: dict, output_path: str, farm_name: s
     ]))
     story.append(proba_tbl)
 
-    # -------------------------------------------------- decision scores ----
     story.append(Paragraph("Decision-Theory Scores", styles["SectionHead"]))
     score_rows = [
         ["Metric", "Value (0-100)", "Explanation"],
@@ -182,7 +168,6 @@ def generate_pdf_report(result: dict, data: dict, output_path: str, farm_name: s
     ]))
     story.append(score_tbl)
 
-    # ---------------------------------------------------- recommendation ---
     story.append(Paragraph("Recommendation", styles["SectionHead"]))
     rec = result["decision_recommendation"]
     rec_tbl = Table([[Paragraph(rec, ParagraphStyle(
@@ -198,11 +183,9 @@ def generate_pdf_report(result: dict, data: dict, output_path: str, farm_name: s
     ]))
     story.append(rec_tbl)
 
-    # ------------------------------------------------------- explanation ---
     story.append(Paragraph("Explanation", styles["SectionHead"]))
     story.append(Paragraph(result["explanation_fil"], styles["BodyFil"]))
-
-    # ------------------------------------------------------- farm profile --
+    
     story.append(Paragraph("Farm Profile Input", styles["SectionHead"]))
     profile_rows = [["Detail", "Value"]]
     for key, label in FIELD_LABELS.items():
@@ -221,7 +204,6 @@ def generate_pdf_report(result: dict, data: dict, output_path: str, farm_name: s
     ]))
     story.append(profile_tbl)
 
-    # ---------------------------------------------------------- footer ----
     story.append(Spacer(1, 16))
     story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#CCCCCC"), spaceAfter=6))
     story.append(Paragraph(
