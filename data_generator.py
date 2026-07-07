@@ -1,10 +1,3 @@
-"""
-Part 1: Data Generator
-Generates a synthetic dataset of swine farm financial indicators in Bayugan City,
-based on Resource-Based View (RBV) Theory: tangible, intangible, and
-financial resources as predictors of profitability.
-"""
-
 import numpy as np
 import pandas as pd
 
