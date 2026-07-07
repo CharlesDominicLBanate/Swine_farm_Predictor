@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+prediction_history.csv
+*.pdf
+.DS_Store
