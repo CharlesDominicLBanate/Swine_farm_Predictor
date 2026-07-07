@@ -1,10 +1,3 @@
-"""
-Part 3: Machine Learning Model Training
-Random Forest classifier (Low/Moderate/High) + Random Forest regressor (exact
-profit margin %). Includes train-test split, evaluation metrics, and
-feature importance.
-"""
-
 import os
 import joblib
 import numpy as np
